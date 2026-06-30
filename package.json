@@ -1,0 +1,92 @@
+{
+  "name": "astranova-ai",
+  "version": "1.0.0",
+  "description": "AstraNovaAI — Marketing Intelligence Platform",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"wait-on http://localhost:3001 && electron .\"",
+    "server": "node server/index.js",
+    "build": "npm run build:server && npm run build:client && npm run build:electron",
+    "build:client": "vite build --outDir dist/client",
+    "build:server": "esbuild server/index.ts --bundle --platform=node --target=node18 --outfile=dist/server/index.js --external:better-sqlite3 --external:electron",
+    "build:electron": "electron-builder",
+    "publish:win": "electron-builder --win --publish always",
+    "publish:mac": "electron-builder --mac --publish always",
+    "start": "electron ."
+  },
+  "build": {
+    "appId": "com.astranovalai.app",
+    "productName": "AstraNovaAI",
+    "copyright": "Copyright © 2026 Thornburg & Downey Marketing",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/**/*",
+      "node_modules/**/*",
+      "!node_modules/.cache"
+    ],
+    "extraResources": [
+      {
+        "from": "node_modules/better-sqlite3/build",
+        "to": "better-sqlite3/build"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.business"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AstraNovaAI"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "astranovalai",
+      "repo": "astranova-releases"
+    }
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "better-sqlite3": "^11.10.0",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.45.2",
+    "electron-updater": "^6.3.9",
+    "express": "^5.0.1",
+    "jsonwebtoken": "^9.0.3",
+    "node-fetch": "^3.3.2",
+    "stripe": "^22.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.1.2",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "esbuild": "^0.25.0",
+    "typescript": "5.6.3",
+    "vite": "^7.3.0",
+    "wait-on": "^8.0.1"
+  }
+}

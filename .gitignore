@@ -1,0 +1,10 @@
+node_modules/
+dist/
+release/
+*.db
+*.db-shm
+*.db-wal
+.env
+.env.local
+assets/icon.ico
+assets/icon.icns
