@@ -63,7 +63,7 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "astranovalai",
+      "owner": "thornburgdowney",
       "repo": "astranova-releases"
     }
   },
