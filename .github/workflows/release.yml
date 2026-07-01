@@ -30,6 +30,16 @@ jobs:
       - name: Build client bundle
         run: npx vite build --outDir dist/client
 
+      - name: Verify dist structure
+        run: |
+          echo "=== dist/ contents ==="
+          dir dist
+          echo "=== dist/server/ contents ==="
+          dir dist\server
+          echo "=== dist/client/ contents ==="
+          dir dist\client
+        shell: cmd
+
       - name: Build & publish Windows installer
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -58,6 +68,15 @@ jobs:
 
       - name: Build client bundle
         run: npx vite build --outDir dist/client
+
+      - name: Verify dist structure
+        run: |
+          echo "=== dist/ contents ==="
+          ls -la dist/
+          echo "=== dist/server/ contents ==="
+          ls -la dist/server/
+          echo "=== dist/client/ contents ==="
+          ls -la dist/client/
 
       - name: Build & publish macOS installer
         env:

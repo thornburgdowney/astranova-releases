@@ -1,6 +1,6 @@
 {
   "name": "astranova-ai",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "AstraNovaAI \u2014 Marketing Intelligence Platform",
   "main": "electron/main.js",
   "scripts": {
