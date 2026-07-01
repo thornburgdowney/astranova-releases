@@ -5,34 +5,40 @@ import * as schema from "@shared/schema";
 import path from "path";
 import fs from "fs";
 
-// Load native binding from prebuilt path (bypasses bindings module lookup)
-function loadSqliteAddon() {
+// ── Native binding resolution ────────────────────────────────────────────────
+// In a packaged Electron app, extraResources puts the .node file at:
+//   <resourcesPath>/better-sqlite3/build/Release/better_sqlite3.node
+// In dev, it's in node_modules.
+function loadSqliteAddon(): string | null {
+  const resourcesPath = process.env.RESOURCES_PATH || '';
   const candidates = [
-    path.resolve(process.cwd(), "node_modules/better-sqlite3/build/Release/better_sqlite3.node"),
-    path.resolve(process.cwd(), "prebuilds/linux-x64/better_sqlite3.node"),
-    path.resolve(__dirname, "../node_modules/better-sqlite3/build/Release/better_sqlite3.node"),
-    path.resolve(__dirname, "../prebuilds/linux-x64/better_sqlite3.node"),
-  ];
+    // Packaged app path (passed via RESOURCES_PATH env var from main.js)
+    resourcesPath ? path.join(resourcesPath, 'better-sqlite3', 'build', 'Release', 'better_sqlite3.node') : '',
+    // Dev paths
+    path.resolve(process.cwd(), 'node_modules', 'better-sqlite3', 'build', 'Release', 'better_sqlite3.node'),
+    path.resolve(__dirname, '..', 'node_modules', 'better-sqlite3', 'build', 'Release', 'better_sqlite3.node'),
+  ].filter(Boolean);
+
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) {
-      try {
-        const binding = { exports: {} as any };
-        process.dlopen(binding, candidate);
-        console.log("[sqlite] loaded native addon from:", candidate);
-        return binding.exports;
-      } catch (e) {
-        console.warn("[sqlite] dlopen failed for", candidate, ":", (e as any).message);
-      }
+      console.log('[sqlite] found native addon at:', candidate);
+      return candidate;
     }
   }
-  console.warn("[sqlite] no prebuilt binary found, falling back to default bindings");
+  console.warn('[sqlite] no prebuilt binary found, letting better-sqlite3 resolve itself');
   return null;
 }
 
-const dbPath = path.resolve(process.cwd(), "data.db");
-const nativeAddon = loadSqliteAddon();
-const sqlite = nativeAddon ? new Database(dbPath, { nativeBinding: nativeAddon } as any) : new Database(dbPath);
-console.log("[sqlite] database opened:", dbPath);
+// Use DATA_DIR env var (set by Electron main.js) or fall back to cwd for dev
+const DATA_DIR = process.env.DATA_DIR || path.resolve(process.cwd(), 'data');
+fs.mkdirSync(DATA_DIR, { recursive: true });
+const dbPath = path.join(DATA_DIR, 'astranova.db');
+
+const nativeBinding = loadSqliteAddon();
+const sqlite = nativeBinding
+  ? new Database(dbPath, { nativeBinding } as any)
+  : new Database(dbPath);
+console.log('[sqlite] database opened:', dbPath);
 const db = drizzle(sqlite, { schema });
 
 // ─── Schema Bootstrap ───────────────────────────────────────────────────────

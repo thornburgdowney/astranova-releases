@@ -101,15 +101,27 @@ async function startServer() {
       NODE_ENV: 'production',
       DATA_DIR: dataDir,
       VULTR_URL: 'http://104.156.247.16',
+      RESOURCES_PATH: process.resourcesPath || '',
     },
     silent: true,
   });
 
   serverProcess.stdout?.on('data', (d) => console.log('[server]', d.toString().trim()));
-  serverProcess.stderr?.on('data', (d) => console.error('[server]', d.toString().trim()));
-  serverProcess.on('exit', (code) => console.log('[server] exited with code', code));
+  serverProcess.stderr?.on('data', (d) => console.error('[server stderr]', d.toString().trim()));
+  serverProcess.on('exit', (code, signal) => {
+    console.log(`[server] exited with code ${code}, signal ${signal}`);
+    if (code !== 0 && mainWindow) {
+      mainWindow.webContents.send('server-error', `Server exited with code ${code}`);
+    }
+  });
 
-  await waitForServer(SERVER_PORT);
+  try {
+    await waitForServer(SERVER_PORT);
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error('[server] failed to start:', errMsg);
+    throw new Error(`Server did not start. Check that port ${SERVER_PORT} is free and better-sqlite3 is installed correctly.`);
+  }
   console.log(`[server] Ready on port ${SERVER_PORT} | data → ${dataDir}`);
 }
 
