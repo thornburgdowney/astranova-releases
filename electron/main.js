@@ -5,6 +5,27 @@ const fs = require('fs');
 const { fork } = require('child_process');
 const net = require('net');
 
+// ── Early file logger (writes before app is ready) ───────────────────────────
+let _logStream = null;
+function getLogPath() {
+  // app.getPath not available yet — use env or temp
+  const base = process.env.APPDATA || process.env.HOME || require('os').tmpdir();
+  const dir = path.join(base, 'AstraNovaAI');
+  try { fs.mkdirSync(dir, { recursive: true }); } catch {}
+  return path.join(dir, 'startup.log');
+}
+function log(...args) {
+  const msg = `[${new Date().toISOString()}] ${args.join(' ')}\n`;
+  process.stdout.write(msg);
+  try {
+    if (!_logStream) _logStream = fs.createWriteStream(getLogPath(), { flags: 'a' });
+    _logStream.write(msg);
+  } catch {}
+}
+process.on('uncaughtException', (err) => {
+  log('UNCAUGHT EXCEPTION:', err.stack || err.message);
+});
+
 let mainWindow = null;
 let serverProcess = null;
 const SERVER_PORT = 3001;
@@ -84,7 +105,7 @@ function waitForServer(port, retries = 30) {
 async function startServer() {
   const inUse = await isPortInUse(SERVER_PORT);
   if (inUse) {
-    console.log(`Port ${SERVER_PORT} already in use — skipping server start`);
+    log(`Port ${SERVER_PORT} already in use — skipping server start`);
     return;
   }
 
@@ -93,6 +114,11 @@ async function startServer() {
     : path.join(__dirname, '..', 'dist', 'server', 'index.js');
 
   const dataDir = getDataDir();
+  log(`[startup] isPackaged=${app.isPackaged}`);
+  log(`[startup] serverPath=${serverPath}`);
+  log(`[startup] serverExists=${fs.existsSync(serverPath)}`);
+  log(`[startup] resourcesPath=${process.resourcesPath}`);
+  log(`[startup] dataDir=${dataDir}`);
 
   serverProcess = fork(serverPath, [], {
     env: {
@@ -106,10 +132,10 @@ async function startServer() {
     silent: true,
   });
 
-  serverProcess.stdout?.on('data', (d) => console.log('[server]', d.toString().trim()));
-  serverProcess.stderr?.on('data', (d) => console.error('[server stderr]', d.toString().trim()));
+  serverProcess.stdout?.on('data', (d) => log('[server]', d.toString().trim()));
+  serverProcess.stderr?.on('data', (d) => log('[server ERROR]', d.toString().trim()));
   serverProcess.on('exit', (code, signal) => {
-    console.log(`[server] exited with code ${code}, signal ${signal}`);
+    log(`[server] exited with code ${code}, signal ${signal}`);
     if (code !== 0 && mainWindow) {
       mainWindow.webContents.send('server-error', `Server exited with code ${code}`);
     }
@@ -119,8 +145,8 @@ async function startServer() {
     await waitForServer(SERVER_PORT);
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err);
-    console.error('[server] failed to start:', errMsg);
-    throw new Error(`Server did not start. Check that port ${SERVER_PORT} is free and better-sqlite3 is installed correctly.`);
+    log('[server] failed to start:', errMsg);
+    throw new Error(`Server did not start. Check that port ${SERVER_PORT} is free and better-sqlite3 is installed correctly. See log: ${getLogPath()}`);
   }
   console.log(`[server] Ready on port ${SERVER_PORT} | data → ${dataDir}`);
 }
