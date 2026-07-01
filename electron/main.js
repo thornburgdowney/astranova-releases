@@ -120,6 +120,12 @@ async function startServer() {
   log(`[startup] resourcesPath=${process.resourcesPath}`);
   log(`[startup] dataDir=${dataDir}`);
 
+  // In packaged app, node_modules live under resources/node_modules
+  const resourcesNodeModules = app.isPackaged
+    ? path.join(process.resourcesPath, 'node_modules')
+    : path.join(__dirname, '..', 'node_modules');
+  log(`[startup] resourcesNodeModules=${resourcesNodeModules}`);
+
   serverProcess = fork(serverPath, [], {
     env: {
       ...process.env,
@@ -128,6 +134,8 @@ async function startServer() {
       DATA_DIR: dataDir,
       VULTR_URL: 'http://104.156.247.16',
       RESOURCES_PATH: process.resourcesPath || '',
+      // Tell Node where to find native modules in the packaged app
+      NODE_PATH: resourcesNodeModules,
     },
     silent: true,
   });
