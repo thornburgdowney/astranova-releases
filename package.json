@@ -1,7 +1,7 @@
 {
   "name": "astranova-ai",
-  "version": "1.0.0",
-  "description": "AstraNovaAI — Marketing Intelligence Platform",
+  "version": "1.0.8",
+  "description": "AstraNovaAI \u2014 Marketing Intelligence Platform",
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"wait-on http://localhost:3001 && electron .\"",
@@ -17,7 +17,7 @@
   "build": {
     "appId": "com.astranovalai.app",
     "productName": "AstraNovaAI",
-    "copyright": "Copyright © 2026 Thornburg & Downey Marketing",
+    "copyright": "Copyright \u00a9 2026 Thornburg & Downey Marketing",
     "directories": {
       "output": "release"
     },
