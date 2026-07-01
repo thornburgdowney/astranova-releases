@@ -1,6 +1,6 @@
 {
   "name": "astranova-ai",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "AstraNovaAI \u2014 Marketing Intelligence Platform",
   "main": "electron/main.js",
   "scripts": {
@@ -23,7 +23,6 @@
     },
     "files": [
       "electron/**/*",
-      "dist/**/*",
       "node_modules/**/*",
       "!node_modules/.cache"
     ],
@@ -31,6 +30,14 @@
       {
         "from": "node_modules/better-sqlite3/build",
         "to": "better-sqlite3/build"
+      },
+      {
+        "from": "dist/server",
+        "to": "dist/server"
+      },
+      {
+        "from": "dist/client",
+        "to": "dist/client"
       }
     ],
     "win": {
