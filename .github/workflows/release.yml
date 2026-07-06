@@ -6,9 +6,10 @@ on:
       - "v*.*.*"
 
 jobs:
-  # ── Windows installer (.exe) ─────────────────────────────────────────────────
   build-windows:
     runs-on: windows-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,14 +22,22 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build & publish Windows installer
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --win --publish always
+      - name: Build Windows installer
+        run: npx electron-builder --win --publish never
 
-  # ── macOS installer (.dmg) ───────────────────────────────────────────────────
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/*.exe
+            release/*.blockmap
+            release/*.yml
+          token: ${{ secrets.GH_TOKEN }}
+
   build-mac:
     runs-on: macos-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,7 +50,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build & publish macOS installer
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --mac --publish always
+      - name: Build macOS installer
+        run: npx electron-builder --mac --publish never
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/*.dmg
+            release/*.blockmap
+            release/*.yml
+          token: ${{ secrets.GH_TOKEN }}
