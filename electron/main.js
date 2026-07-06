@@ -1,5 +1,4 @@
 const { app, BrowserWindow, shell, ipcMain } = require('electron');
-const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const fs = require('fs');
 
@@ -69,11 +68,6 @@ app.whenReady().then(() => {
   log(`[startup] App ready, version=${app.getVersion()}, platform=${process.platform}`);
   createWindow();
 
-  // Check for updates after window is ready
-  if (app.isPackaged) {
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
@@ -81,24 +75,4 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
-});
-
-// ── Auto-updater events ───────────────────────────────────────────────────────
-autoUpdater.on('update-available', () => {
-  log('[updater] Update available');
-  if (mainWindow) mainWindow.webContents.send('update-available');
-});
-
-autoUpdater.on('update-downloaded', () => {
-  log('[updater] Update downloaded — will install on restart');
-  if (mainWindow) mainWindow.webContents.send('update-downloaded');
-});
-
-autoUpdater.on('error', (err) => {
-  log('[updater] Error:', err.message);
-});
-
-// ── IPC ───────────────────────────────────────────────────────────────────────
-ipcMain.on('install-update', () => {
-  autoUpdater.quitAndInstall();
 });

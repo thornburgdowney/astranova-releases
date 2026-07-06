@@ -1,6 +1,6 @@
 {
   "name": "astranova-ai",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "AstraNovaAI — Marketing Intelligence Platform",
   "main": "electron/main.js",
   "scripts": {
@@ -19,7 +19,8 @@
     "files": [
       "electron/**/*",
       "assets/**/*",
-      "!node_modules/**/*"
+      "node_modules/**/*",
+      "!node_modules/.cache/**/*"
     ],
     "extraResources": [],
     "win": {
@@ -59,8 +60,7 @@
       "provider": "github",
       "owner": "thornburgdowney",
       "repo": "astranova-releases"
-    },
-    "npmRebuild": false
+    }
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -68,7 +68,6 @@
     "@types/react-dom": "^19.2.3",
     "bcryptjs": "^3.0.3",
     "dotenv": "^16.4.7",
-    "electron-updater": "^6.3.9",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.22.0",
     "node-fetch": "^3.3.2",
