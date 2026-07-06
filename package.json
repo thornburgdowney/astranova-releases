@@ -1,53 +1,27 @@
 {
   "name": "astranova-ai",
-  "version": "1.1.1",
-  "description": "AstraNovaAI \u2014 Marketing Intelligence Platform",
+  "version": "1.2.0",
+  "description": "AstraNovaAI — Marketing Intelligence Platform",
   "main": "electron/main.js",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"wait-on http://localhost:3001 && electron .\"",
-    "server": "node server/index.js",
-    "build": "npm run build:server && npm run build:client && npm run build:electron",
-    "build:client": "vite build --outDir dist/client",
-    "build:server": "esbuild server/index.ts --bundle --platform=node --target=node18 --outfile=dist/server/index.js --external:better-sqlite3 --external:electron",
+    "start": "electron .",
     "build:electron": "electron-builder",
     "publish:win": "electron-builder --win --publish always",
-    "publish:mac": "electron-builder --mac --publish always",
-    "start": "electron ."
+    "publish:mac": "electron-builder --mac --publish always"
   },
   "build": {
     "appId": "com.astranovalai.app",
     "productName": "AstraNovaAI",
-    "copyright": "Copyright \u00a9 2026 Thornburg & Downey Marketing",
+    "copyright": "Copyright © 2026 Thornburg & Downey Marketing",
     "directories": {
       "output": "release"
     },
     "files": [
       "electron/**/*",
-      "node_modules/**/*",
-      "!node_modules/.cache"
+      "assets/**/*",
+      "!node_modules/**/*"
     ],
-    "extraResources": [
-      {
-        "from": "node_modules/better-sqlite3",
-        "to": "node_modules/better-sqlite3"
-      },
-      {
-        "from": "node_modules/bindings",
-        "to": "node_modules/bindings"
-      },
-      {
-        "from": "node_modules/file-uri-to-path",
-        "to": "node_modules/file-uri-to-path"
-      },
-      {
-        "from": "dist/server",
-        "to": "dist/server"
-      },
-      {
-        "from": "dist/client",
-        "to": "dist/client"
-      }
-    ],
+    "extraResources": [],
     "win": {
       "target": [
         {
@@ -85,18 +59,16 @@
       "provider": "github",
       "owner": "thornburgdowney",
       "repo": "astranova-releases"
-    }
+    },
+    "npmRebuild": false
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^11.10.0",
     "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.45.2",
     "electron-updater": "^6.3.9",
-    "express": "^5.0.1",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.22.0",
     "node-fetch": "^3.3.2",

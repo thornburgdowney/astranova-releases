@@ -19,26 +19,7 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: npm install --ignore-scripts
-
-      - name: Rebuild native modules for Electron
-        run: npx electron-builder install-app-deps
-
-      - name: Build server bundle
-        run: npx esbuild server/index.ts --bundle --platform=node --target=node18 --outfile=dist/server/index.js --external:better-sqlite3 --external:electron
-
-      - name: Build client bundle
-        run: npx vite build --outDir dist/client
-
-      - name: Verify dist structure
-        run: |
-          echo "=== dist/ contents ==="
-          dir dist
-          echo "=== dist/server/ contents ==="
-          dir dist\server
-          echo "=== dist/client/ contents ==="
-          dir dist\client
-        shell: cmd
+        run: npm install
 
       - name: Build & publish Windows installer
         env:
@@ -58,25 +39,7 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: npm install --ignore-scripts
-
-      - name: Rebuild native modules for Electron
-        run: npx electron-builder install-app-deps
-
-      - name: Build server bundle
-        run: npx esbuild server/index.ts --bundle --platform=node --target=node18 --outfile=dist/server/index.js --external:better-sqlite3 --external:electron
-
-      - name: Build client bundle
-        run: npx vite build --outDir dist/client
-
-      - name: Verify dist structure
-        run: |
-          echo "=== dist/ contents ==="
-          ls -la dist/
-          echo "=== dist/server/ contents ==="
-          ls -la dist/server/
-          echo "=== dist/client/ contents ==="
-          ls -la dist/client/
+        run: npm install
 
       - name: Build & publish macOS installer
         env:
